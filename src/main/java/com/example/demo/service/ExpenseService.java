@@ -13,36 +13,37 @@ import java.util.stream.Collectors;
 @Service
 public class ExpenseService {
 
-
-
-    public Expense getGroupExpenses(String groupId,Group g) {
+    public Expense getGroupExpenses(String groupId, Group g) {
 
         if (!g.getId().equals(groupId)) {
             throw new RuntimeException("Unauthorized");
         }
-        List<User> user=g.getUsers();
+        List<User> user = g.getUsers();
 
-        List<Expense> expenses=g.getExpenses();
+        List<Expense> expenses = g.getExpenses();
 
-//        Map<User, BigDecimal> finalMap = balanceMaps.stream()
-//                .flatMap(m -> m.entrySet().stream())   // flatten all maps
-//                .collect(Collectors.toMap(
-//                        Map.Entry::getKey,             // group by User
-//                        e -> e.getValue().getAmount(), // starting value
-//                        BigDecimal::add                // merge values when duplicate User is found
-//                ));
-//        finalMap.forEach((x,t)-> System.out.println(x.getFirstName()+"-->"+t.toString()));
+        // Map<User, BigDecimal> finalMap = balanceMaps.stream()
+        // .flatMap(m -> m.entrySet().stream()) // flatten all maps
+        // .collect(Collectors.toMap(
+        // Map.Entry::getKey, // group by User
+        // e -> e.getValue().getAmount(), // starting value
+        // BigDecimal::add // merge values when duplicate User is found
+        // ));
+        // finalMap.forEach((x,t)-> System.out.println(x.getFirstName()+"-->"+t.toString()));
 
-        Map<User,Balance> finalBal=new HashMap<>();
-        expenses
-                .stream()
-                .map(expense1 -> expense1.getBalanceMap().getUserBalanceMap()).toList()
-                .forEach(x->x.forEach((y,j)->{
-            Balance i = finalBal.get(y) != null ? finalBal.put(y, Balance.builder().amount(new BigDecimal(finalBal.get(y).getAmount().intValue()+j.getAmount().intValue())).build())
-                    : finalBal.put(y, Balance.builder().amount(new BigDecimal(j.getAmount().intValue())).build());
-        }));
+        Map<User, Balance> finalBal = new HashMap<>();
+        expenses.stream().map(expense1 -> expense1.getBalanceMap().getUserBalanceMap()).toList()
+                .forEach(x -> x.forEach((y, j) -> {
+                    Balance i = finalBal.get(y) != null
+                            ? finalBal.put(y, Balance.builder()
+                                    .amount(new BigDecimal(
+                                            finalBal.get(y).getAmount().intValue() + j.getAmount().intValue()))
+                                    .build())
+                            : finalBal.put(y,
+                                    Balance.builder().amount(new BigDecimal(j.getAmount().intValue())).build());
+                }));
 
-        finalBal.forEach((x,y)-> System.out.println(x.getFirstName()+"<--->"+y.getAmount()));
+        finalBal.forEach((x, y) -> System.out.println(x.getFirstName() + "<--->" + y.getAmount()));
 
         createHeaps(Expense.builder().balanceMap(new BalanceMap(finalBal)).build());
         return Expense.builder().balanceMap(new BalanceMap(finalBal)).build();
@@ -56,36 +57,28 @@ public class ExpenseService {
     private void createHeaps(Expense resultExpense) {
         PriorityQueue<PerUserBalance> maxHeap = new PriorityQueue<>((a, b) -> b.getBal() - a.getBal());
         PriorityQueue<PerUserBalance> minHeap = new PriorityQueue<>();
-        resultExpense
-                .getBalanceMap()
-                .getUserBalanceMap()
-                .forEach((l,m)->{
-                    if(m.getAmount().intValue()<0)
-                    {
-                        minHeap.add(PerUserBalance.builder().user(l).bal(m.getAmount().intValue()).build());
-                    }
-                    else if(m.getAmount().intValue()>0)
-                    {
-                        maxHeap.add(PerUserBalance.builder().user(l).bal(m.getAmount().intValue()).build());
-                    }
+        resultExpense.getBalanceMap().getUserBalanceMap().forEach((l, m) -> {
+            if (m.getAmount().intValue() < 0) {
+                minHeap.add(PerUserBalance.builder().user(l).bal(m.getAmount().intValue()).build());
+            } else if (m.getAmount().intValue() > 0) {
+                maxHeap.add(PerUserBalance.builder().user(l).bal(m.getAmount().intValue()).build());
+            }
 
-                });
+        });
         System.out.println(maxHeap);
         System.out.println(minHeap);
-        createPaymentGraph(minHeap,maxHeap);
+        createPaymentGraph(minHeap, maxHeap);
     }
 
     private void createPaymentGraph(PriorityQueue<PerUserBalance> minHeap, PriorityQueue<PerUserBalance> maxHeap) {
-        while(!minHeap.isEmpty())
-        {
-            PerUserBalance min=minHeap.poll();
-            PerUserBalance max=maxHeap.poll();
-            int bal=min.getBal()+max.getBal();
-            System.out.println(min.getUser().getFirstName()+"paid "+max.getUser().getFirstName()+
-                    "money-->"+(Math.max(Math.abs(min.getBal()),Math.abs(max.getBal()))-Math.abs(bal)));
+        while (!minHeap.isEmpty()) {
+            PerUserBalance min = minHeap.poll();
+            PerUserBalance max = maxHeap.poll();
+            int bal = min.getBal() + max.getBal();
+            System.out.println(min.getUser().getFirstName() + "paid " + max.getUser().getFirstName() + "money-->"
+                    + (Math.max(Math.abs(min.getBal()), Math.abs(max.getBal())) - Math.abs(bal)));
 
-            boolean b = bal < 0 ?
-                    minHeap.add(PerUserBalance.builder().user(min.getUser()).bal(bal).build())
+            boolean b = bal < 0 ? minHeap.add(PerUserBalance.builder().user(min.getUser()).bal(bal).build())
                     : maxHeap.add(PerUserBalance.builder().user(max.getUser()).bal(bal).build());
         }
     }

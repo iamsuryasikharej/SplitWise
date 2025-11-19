@@ -15,18 +15,16 @@ public class TestController {
 
     private final GroupService groupService;
 
-
     @GetMapping("/getGroupExpenses")
-    public Expense getGroupExpenses()
-    {
-        return groupService.getBalances("123","12345");
+    public Expense getGroupExpenses() {
+        return groupService.getBalances("123", "12345");
 
     }
 
-//    @GetMapping("/getGroupExpenses")
-//    public Expense getPaymentGrph(String groupId,String userId)
-//    {
-//        return groupService.getBalances("123","12345");
-//
-//    }
+    // @GetMapping("/getGroupExpenses")
+    // public Expense getPaymentGrph(String groupId,String userId)
+    // {
+    // return groupService.getBalances("123","12345");
+    //
+    // }
 }

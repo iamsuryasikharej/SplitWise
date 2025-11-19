@@ -15,7 +15,7 @@ public class GroupService {
     @Autowired
     private ExpenseService expenseService;
 
-     Map<String, Group> groupCache=new HashMap<>();
+    Map<String, Group> groupCache = new HashMap<>();
 
     BalanceMap map = BalanceMap.builder()
             .userBalanceMap(Map.of(getListOfDummyUsers().get(0), Balance.builder().amount(new BigDecimal("30")).build(), // a
@@ -44,11 +44,10 @@ public class GroupService {
     Group g = Group.builder().id("123").users(List.of()).expenses(List.of(expense, expense2))
             .users(getListOfDummyUsers()).name("GoaGroup").description("goaTrip").build();
 
-
     public PaymentGraph getGroupPaymentGraph(final String groupId, final String userId) {
 
-//        Expense resultExpense = sumAllGroupExpenses(expensesList);
-//        return expenseService.getPaymentGraph(resultExpense);
+        // Expense resultExpense = sumAllGroupExpenses(expensesList);
+        // return expenseService.getPaymentGraph(resultExpense);
         return null;
 
     }
@@ -57,12 +56,12 @@ public class GroupService {
         return null;
     }
 
-    public Expense getBalances(final String groupId,String userId) {
-        groupCache.put("123",g);
+    public Expense getBalances(final String groupId, String userId) {
+        groupCache.put("123", g);
         if (groupCache.get(groupId).getUsers().stream().noneMatch((x) -> x.getId() == userId)) {
             throw new IllegalArgumentException("User provided is not present in this group");
         }
-        return expenseService.getGroupExpenses(groupId,g);
+        return expenseService.getGroupExpenses(groupId, g);
     }
 
     public List<User> getListOfDummyUsers() {

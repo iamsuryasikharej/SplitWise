@@ -14,13 +14,12 @@ public class Group {
     private final List<User> users;
     private final List<Expense> expenses;
 
-    public Group(Group g)
-    {
-        this.id=g.id;
-        this.name=g.name;
-        this.description=g.description;
-        this.users=g.getUsers();
-        this.expenses=g.getExpenses();
+    public Group(Group g) {
+        this.id = g.id;
+        this.name = g.name;
+        this.description = g.description;
+        this.users = g.getUsers();
+        this.expenses = g.getExpenses();
     }
 
 }

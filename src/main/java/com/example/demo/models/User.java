@@ -8,15 +8,15 @@ import java.util.Objects;
 @Builder
 @AllArgsConstructor
 
-
 public class User {
     private final String id, firstName, LastName, bio, imageURL;
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null || getClass() != o.getClass())
+            return false;
         User user = (User) o;
-        return Objects.equals(id, user.id) ;
+        return Objects.equals(id, user.id);
     }
 
     @Override
@@ -28,6 +28,5 @@ public class User {
     public String toString() {
         return this.firstName;
     }
-
 
 }
