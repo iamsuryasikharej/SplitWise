@@ -1,10 +1,15 @@
 package com.example.demo.models;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Map;
 
-@AllArgsConstructor
+@Getter
+@Setter
+@Builder
 public class PaymentGraph {
-    private final Map<User, BalanceMap> graph;
+    private Map<User, BalanceMap> graph;
 }

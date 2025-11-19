@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.models.Expense;
+import com.example.demo.models.PaymentGraph;
 import com.example.demo.service.ExpenseService;
 import com.example.demo.service.GroupService;
 import lombok.RequiredArgsConstructor;
@@ -21,10 +22,10 @@ public class TestController {
 
     }
 
-    // @GetMapping("/getGroupExpenses")
-    // public Expense getPaymentGrph(String groupId,String userId)
-    // {
-    // return groupService.getBalances("123","12345");
-    //
-    // }
+     @GetMapping("/getPaymentGraph")
+     public PaymentGraph getPaymentGrph(String groupId, String userId)
+     {
+     return groupService.getPaymentGraph("123","12345");
+
+     }
 }

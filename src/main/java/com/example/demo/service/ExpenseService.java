@@ -45,16 +45,16 @@ public class ExpenseService {
 
         finalBal.forEach((x, y) -> System.out.println(x.getFirstName() + "<--->" + y.getAmount()));
 
-        createHeaps(Expense.builder().balanceMap(new BalanceMap(finalBal)).build());
+
         return Expense.builder().balanceMap(new BalanceMap(finalBal)).build();
 
     }
 
-    public void getPaymentGraph(Expense resultExpense) {
-        createHeaps(resultExpense);
+    public PaymentGraph getPaymentGraph(Expense resultExpense) {
+        return createHeaps(resultExpense);
     }
 
-    private void createHeaps(Expense resultExpense) {
+    private PaymentGraph createHeaps(Expense resultExpense) {
         PriorityQueue<PerUserBalance> maxHeap = new PriorityQueue<>((a, b) -> b.getBal() - a.getBal());
         PriorityQueue<PerUserBalance> minHeap = new PriorityQueue<>();
         resultExpense.getBalanceMap().getUserBalanceMap().forEach((l, m) -> {
@@ -65,22 +65,36 @@ public class ExpenseService {
             }
 
         });
-        System.out.println(maxHeap);
-        System.out.println(minHeap);
-        createPaymentGraph(minHeap, maxHeap);
+        return createPaymentGraph(minHeap, maxHeap);
     }
 
-    private void createPaymentGraph(PriorityQueue<PerUserBalance> minHeap, PriorityQueue<PerUserBalance> maxHeap) {
+    private PaymentGraph createPaymentGraph(PriorityQueue<PerUserBalance> minHeap, PriorityQueue<PerUserBalance> maxHeap) {
+        StringBuilder sb=new StringBuilder();
+
+        Map<User,BalanceMap> mp=new HashMap<>();
         while (!minHeap.isEmpty()) {
             PerUserBalance min = minHeap.poll();
             PerUserBalance max = maxHeap.poll();
             int bal = min.getBal() + max.getBal();
             System.out.println(min.getUser().getFirstName() + "paid " + max.getUser().getFirstName() + "money-->"
                     + (Math.max(Math.abs(min.getBal()), Math.abs(max.getBal())) - Math.abs(bal)));
+            sb.append(min.getUser().getFirstName() + "paid " + max.getUser().getFirstName() + "money-->"
+                    + (Math.max(Math.abs(min.getBal()), Math.abs(max.getBal())) - Math.abs(bal)));
+
+            Object o = mp.get(min.getUser()) == null ?
+                    mp.put(min.getUser(), BalanceMap.builder()
+                            .userBalanceMap(new HashMap<>(
+                                            Map.of(max.getUser(), Balance.builder().amount(new BigDecimal((Math.max(Math.abs(min.getBal()), Math.abs(max.getBal())) - Math.abs(bal)))).build())
+                                    )
+                                    ).build())
+                    : mp.get(min.getUser()).getUserBalanceMap().put(max.getUser(), Balance.builder().amount(new BigDecimal((Math.max(Math.abs(min.getBal()), Math.abs(max.getBal())) - Math.abs(bal)))).build());
+
 
             boolean b = bal < 0 ? minHeap.add(PerUserBalance.builder().user(min.getUser()).bal(bal).build())
                     : maxHeap.add(PerUserBalance.builder().user(max.getUser()).bal(bal).build());
         }
+        return PaymentGraph.builder().graph(mp).build();
+
     }
 
     public List<User> getListOfDummyUsers() {
