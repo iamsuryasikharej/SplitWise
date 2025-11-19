@@ -73,8 +73,7 @@ public class GroupService {
                 User.builder().bio("erfr").id("1234569").imageURL("qqqqq").firstName("f").LastName("").build());
     }
 
-    public PaymentGraph getPaymentGraph(final String groupId, String userId)
-    {
+    public PaymentGraph getPaymentGraph(final String groupId, String userId) {
         groupCache.put("123", g);
         if (groupCache.get(groupId).getUsers().stream().noneMatch((x) -> x.getId() == userId)) {
             throw new IllegalArgumentException("User provided is not present in this group");

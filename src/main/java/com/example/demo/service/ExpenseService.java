@@ -45,7 +45,6 @@ public class ExpenseService {
 
         finalBal.forEach((x, y) -> System.out.println(x.getFirstName() + "<--->" + y.getAmount()));
 
-
         return Expense.builder().balanceMap(new BalanceMap(finalBal)).build();
 
     }
@@ -68,27 +67,29 @@ public class ExpenseService {
         return createPaymentGraph(minHeap, maxHeap);
     }
 
-    private PaymentGraph createPaymentGraph(PriorityQueue<PerUserBalance> minHeap, PriorityQueue<PerUserBalance> maxHeap) {
-        StringBuilder sb=new StringBuilder();
+    private PaymentGraph createPaymentGraph(PriorityQueue<PerUserBalance> minHeap,
+            PriorityQueue<PerUserBalance> maxHeap) {
 
-        Map<User,BalanceMap> mp=new HashMap<>();
+        Map<User, BalanceMap> mp = new HashMap<>();
         while (!minHeap.isEmpty()) {
             PerUserBalance min = minHeap.poll();
             PerUserBalance max = maxHeap.poll();
             int bal = min.getBal() + max.getBal();
             System.out.println(min.getUser().getFirstName() + "paid " + max.getUser().getFirstName() + "money-->"
                     + (Math.max(Math.abs(min.getBal()), Math.abs(max.getBal())) - Math.abs(bal)));
-            sb.append(min.getUser().getFirstName() + "paid " + max.getUser().getFirstName() + "money-->"
-                    + (Math.max(Math.abs(min.getBal()), Math.abs(max.getBal())) - Math.abs(bal)));
 
-            Object o = mp.get(min.getUser()) == null ?
-                    mp.put(min.getUser(), BalanceMap.builder()
-                            .userBalanceMap(new HashMap<>(
-                                            Map.of(max.getUser(), Balance.builder().amount(new BigDecimal((Math.max(Math.abs(min.getBal()), Math.abs(max.getBal())) - Math.abs(bal)))).build())
-                                    )
-                                    ).build())
-                    : mp.get(min.getUser()).getUserBalanceMap().put(max.getUser(), Balance.builder().amount(new BigDecimal((Math.max(Math.abs(min.getBal()), Math.abs(max.getBal())) - Math.abs(bal)))).build());
-
+            Object o = mp.get(min.getUser()) == null
+                    ? mp.put(min.getUser(),
+                            BalanceMap.builder().userBalanceMap(new HashMap<>(Map.of(max.getUser(),
+                                    Balance.builder().amount(new BigDecimal(
+                                            (Math.max(Math.abs(min.getBal()), Math.abs(max.getBal())) - Math.abs(bal))))
+                                            .build())))
+                                    .build())
+                    : mp.get(min.getUser()).getUserBalanceMap().put(max.getUser(),
+                            Balance.builder()
+                                    .amount(new BigDecimal(
+                                            (Math.max(Math.abs(min.getBal()), Math.abs(max.getBal())) - Math.abs(bal))))
+                                    .build());
 
             boolean b = bal < 0 ? minHeap.add(PerUserBalance.builder().user(min.getUser()).bal(bal).build())
                     : maxHeap.add(PerUserBalance.builder().user(max.getUser()).bal(bal).build());

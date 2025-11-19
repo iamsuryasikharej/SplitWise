@@ -22,10 +22,9 @@ public class TestController {
 
     }
 
-     @GetMapping("/getPaymentGraph")
-     public PaymentGraph getPaymentGrph(String groupId, String userId)
-     {
-     return groupService.getPaymentGraph("123","12345");
+    @GetMapping("/getPaymentGraph")
+    public PaymentGraph getPaymentGrph(String groupId, String userId) {
+        return groupService.getPaymentGraph("123", "12345");
 
-     }
+    }
 }
