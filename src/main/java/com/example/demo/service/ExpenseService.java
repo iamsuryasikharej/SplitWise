@@ -83,16 +83,10 @@ public class ExpenseService {
             int bal=min.getBal()+max.getBal();
             System.out.println(min.getUser().getFirstName()+"paid "+max.getUser().getFirstName()+
                     "money-->"+(Math.max(Math.abs(min.getBal()),Math.abs(max.getBal()))-Math.abs(bal)));
-            if(bal<0)
-            {
 
-                minHeap.add(PerUserBalance.builder().user(min.getUser()).bal(bal).build());
-            }
-            else if(bal>0)
-            {
-
-                maxHeap.add(PerUserBalance.builder().user(max.getUser()).bal(bal).build());
-            }
+            boolean b = bal < 0 ?
+                    minHeap.add(PerUserBalance.builder().user(min.getUser()).bal(bal).build())
+                    : maxHeap.add(PerUserBalance.builder().user(max.getUser()).bal(bal).build());
         }
     }
 
