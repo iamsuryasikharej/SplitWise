@@ -9,7 +9,7 @@ import java.util.concurrent.Future;
 
 public class Cache<K, V> {
 
-    Map<K, V> cache = new HashMap<>();
+    Map<K, V> cache = new ConcurrentHashMap<>();
 
     public Future<V> set(K k, V v) {
         return CompletableFuture.supplyAsync(() -> {
