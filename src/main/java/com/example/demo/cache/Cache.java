@@ -120,15 +120,19 @@ public class Cache<K,V> {
     {
         if(listByAccessCount.containsKey(cache.get(k).accessCount))
         {
+            List<Record<V>> toRemove=new ArrayList<>();
+            int index=-1;
             listByAccessCount
                     .get(cache.get(k).accessCount)
                     .stream().forEach(v->{
                         if(v.v==cache.get(k).v){
-                            listByAccessCount
-                                    .get(cache.get(k).accessCount)
-                                    .remove(v);
+                          toRemove.add(cache.get(k));
                         }
                     });
+            listByAccessCount
+                    .get(cache.get(k).accessCount)
+                    .remove(toRemove.get(0));
         }
+
     }
 }
