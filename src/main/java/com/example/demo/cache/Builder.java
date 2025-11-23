@@ -14,12 +14,12 @@ class Record<V> {
 
     @Override
     public int hashCode() {
-        return  super.hashCode();
+        return super.hashCode();
     }
 
     @Override
     public boolean equals(Object obj) {
-        Record<V> rec=(Record<V>) obj;
+        Record<V> rec = (Record<V>) obj;
         return this.v.equals(rec.v);
     }
 }
