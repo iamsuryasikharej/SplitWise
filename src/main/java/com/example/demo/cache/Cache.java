@@ -1,7 +1,6 @@
 package com.example.demo.cache;
 
-import com.sun.jdi.VoidType;
-import lombok.Builder;
+import org.w3c.dom.ls.LSInput;
 
 import java.time.Instant;
 import java.util.*;
@@ -11,8 +10,11 @@ public class Cache<K, V> {
 
     MockDataSource<K, V> ds;
     ConcurrentHashMap<K, Record<V>> cache = new ConcurrentHashMap<>();
-    WritePloicy writePloicy = WritePloicy.WRITE_THROUGH;
+    WritePloicy writePolicy = WritePloicy.WRITE_THROUGH;
     final ReplacementPolicy policy = ReplacementPolicy.LFU;
+//    ExecutorService[] es=new ExecutorService[3];
+    Map<Integer, List<K>> accessCountHashMap=new ConcurrentHashMap<>();
+
     Comparator<Instant> accessTimeTimeComparator = new Comparator<Instant>() {
         @Override
         public int compare(Instant o1, Instant o2) {
@@ -38,7 +40,7 @@ public class Cache<K, V> {
 
             }
             // replacement algo
-        } else if (writePloicy.equals(WritePloicy.WRITE_THROUGH)) {
+        } else if (writePolicy == WritePloicy.WRITE_THROUGH) { //Enums should always be compared using ==
             return ds.insert(k, v).thenAccept(__ -> cache.put(k,
                     Record.<V> builder().v(v).accessCount(1).loadTime(Instant.now()).accessedAt(Instant.now()).build()));
         } else {
@@ -53,15 +55,37 @@ public class Cache<K, V> {
     public Future<V> get(K k) {
         if (cache.containsKey(k) && cache.get(k).loadTime.toEpochMilli()
                 + Instant.ofEpochSecond(expiresIn).toEpochMilli() >= System.currentTimeMillis()) {
+            addAccessCountMetaData(k);
             Record<V> r=cache.get(k);
-            r.accessCount=r.accessCount+1;
-            r.accessedAt=Instant.now();
+            Record<V> newRecord=new Record<>(r);
+            cache.put(k,newRecord);
             return CompletableFuture.completedFuture(r.v);
         } else {
-            return ds.get(k).thenApply(v1 -> cache.put(k, Record.<V> builder().v(v1).accessCount(1).accessedAt(Instant.now())
-                    .loadTime(Instant.now()).v(v1).build())).thenApply(x3 -> {
+            return ds.get(k).thenApply(v1 -> {cache.put(k, Record.<V> builder().v(v1).accessCount(1).accessedAt(Instant.now())
+                    .loadTime(Instant.now()).v(v1).build());
+//                addAccessCountMetaData(k);
+                if (accessCountHashMap.get(cache.get(k).accessCount)!=null)
+                {
+                    accessCountHashMap.get(cache.get(k).accessCount).add(k);
+                }
+                else{
+                    accessCountHashMap.put(cache.get(k).accessCount,new CopyOnWriteArrayList<>(List.of(k)));
+                }
+                return v1;}).thenApply(x3 -> {
                         return (cache.get(k).v);
                     });
+        }
+    }
+
+    public void addAccessCountMetaData(K k)
+    {
+        accessCountHashMap.get(cache.get(k).accessCount).remove(k);
+        if(accessCountHashMap.get(cache.get(k).accessCount+1)!=null)
+        {
+            accessCountHashMap.get(cache.get(k).accessCount+1).add(k);
+        }
+        else{
+            accessCountHashMap.put(cache.get(k).accessCount+1,new CopyOnWriteArrayList<>(List.of(k)));
         }
     }
 }
