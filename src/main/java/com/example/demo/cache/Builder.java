@@ -2,18 +2,19 @@ package com.example.demo.cache;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 
 import java.time.Instant;
 import java.util.Objects;
 
 @Builder
 @AllArgsConstructor
+@Data
 class Record<V> {
     final V v;
     final Instant timeStamp;
     final Instant loadTime;
-    final Instant accessedAt;
-    final int accessCount;
+    AccessDetails accessDetails;
 
     @Override
     public boolean equals(Object obj) {
@@ -27,8 +28,7 @@ class Record<V> {
         this.v = r.v;
         this.timeStamp = r.timeStamp;
         this.loadTime = r.loadTime;
-        this.accessedAt = Instant.now();
-        this.accessCount = r.accessCount+1;
+        this.accessDetails=new AccessDetails(r.accessDetails.accessCount+1,r.accessDetails.accessedAt);
     }
 
 
@@ -38,4 +38,15 @@ class Record<V> {
         return Objects.hash(v);
     }
 
+    @Override
+    public String toString() {
+        return v.toString();
+    }
+}
+@AllArgsConstructor
+class AccessDetails
+{
+
+    int accessCount;
+    Instant accessedAt;
 }
