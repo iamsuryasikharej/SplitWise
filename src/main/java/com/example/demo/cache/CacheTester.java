@@ -14,7 +14,8 @@ import java.util.Arrays;
 import java.util.concurrent.ExecutionException;
 
 public class CacheTester {
-    public static void main(String[] args) throws InterruptedException, ExecutionException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, NoSuchPaddingException, NoSuchAlgorithmException {
+    public static void main(String[] args) throws InterruptedException, ExecutionException, InvalidKeyException,
+            IllegalBlockSizeException, BadPaddingException, NoSuchPaddingException, NoSuchAlgorithmException {
         MockDataSource<String, String> mockDataSource = new MockDataSource<>();
         mockDataSource.insert("Surya", "Dev");
         mockDataSource.insert("Mac", "m4");
@@ -29,12 +30,18 @@ public class CacheTester {
         System.out.println(c.get("Surya").get());
         System.out.println(c.get("Mac").get());
         System.out.println(c.get("Surya").get());
+        System.out.println(c.get("Surya").get());
+
         System.out.println(c.get("Mac").get());
 
         c.set("silicon", "M1");
         c.set("snapdragon", "x-elite");
         c.set("Mediatek", "Arm");
         c.set("AMD", "ThreadRipper");
+        c.set("exynos", "234");
+        System.out.println(c.get("exynos").get());
+        System.out.println(c.get("exynos").get());
+
         System.out.println(c.cache);
         Thread.sleep(2000);
 

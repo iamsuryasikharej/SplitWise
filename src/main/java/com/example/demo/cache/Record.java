@@ -10,7 +10,7 @@ import java.util.Objects;
 @Builder
 @AllArgsConstructor
 @Data
-class Record<V> {
+public class Record<V> {
     final V v;
     final Instant timeStamp;
     final Instant loadTime;
@@ -18,8 +18,10 @@ class Record<V> {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
+        if (this == obj)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
+            return false;
         Record<?> rec = (Record<?>) obj;
         return Objects.equals(this.v, rec.v);
     }
@@ -28,11 +30,9 @@ class Record<V> {
         this.v = r.v;
         this.timeStamp = r.timeStamp;
         this.loadTime = r.loadTime;
-        this.accessDetails=new AccessDetails(r.accessDetails.accessCount+1,r.accessDetails.accessedAt);
+        this.accessDetails = new AccessDetails(r.accessDetails.accessCount + 1, r.accessDetails.accessedAt);
     }
 
-
-    
     @Override
     public int hashCode() {
         return Objects.hash(v);
@@ -42,11 +42,5 @@ class Record<V> {
     public String toString() {
         return v.toString();
     }
-}
-@AllArgsConstructor
-class AccessDetails
-{
 
-    int accessCount;
-    Instant accessedAt;
 }
